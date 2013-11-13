@@ -1,0 +1,249 @@
+\section{Graph algorithms}
+
+We have some common configuration settings
+
+<<graph config>>=
+#define DTYPE int
+#define INF (1<<30)
+@
+
+\subsection{Adjacency list}
+
+The adjecency list representation: Edges gives the destination node of each edge, edgecost the length
+
+<<graph adjacency>>=
+vector<vector<int> > edges;
+vector<vector<DTYPE> > edgecost;
+@
+
+\subsubsection{Distance results}
+The adjacency list distance algorithms return their results in the following: From gives the node that is the predecessor of this node in the route from start, dist the distance from the start node to this node.
+
+<<graph adjacency distance results>>=
+vector<int> from;
+vector<DTYPE> dist;
+@
+
+\subsubsection{Bellman-Ford}
+\begin{tabular}{|l|l|}
+\hline
+Complexity & $O(VE)$\\
+\hline
+Timing data & not available\\
+\hline
+\end{tabular}
+
+<<bellmanford>>=
+void bellmanford(int start)
+{
+	int n = edges.size();
+	
+	from.clear();
+	from.resize(n, -1);
+	dist.clear();
+	dist.resize(n, INF);
+	
+	dist[start] = 0;
+	
+	for (int i=0; i<n; i++)
+	{
+		for (int f = 0; f<n; f++)
+		{
+			for (int j=0; j<edges[f].size(); j++)
+			{
+				int t = edges[f][j];
+				int cost = edgecost[f][j];
+				
+				if (dist[t] > dist[f] + cost)
+				{
+					dist[t] = dist[f] + cost;
+					from[t] = f;
+				}
+			}
+		}
+	}
+}
+@
+
+\subsubsection{Dijkstra's}
+\begin{tabular}{|l|l|}
+\hline
+Complexity & $O(E\log{V})$\\
+\hline
+Timing data & Not available\\
+\hline
+\end{tabular}
+
+<<dijkstras>>=
+void dijkstras(int start)
+{
+	int NODES = edges.size();
+	
+	priority_queue<pair<int, int> > work;
+	vector<bool> done(NODES, false);
+	
+	dist.clear();
+	dist.resize(NODES, INF);
+	from.clear();
+	from.resize(NODES, -1);
+	
+	dist[start] = 0;
+	from[start] = -1;
+	work.push(make_pair(0, start));
+	
+	while (!work.empty())
+	{
+		int cur = work.top().second;
+		work.pop();
+		
+		if (done[cur])
+			continue;
+		
+		done[cur] = true;
+		
+		for (int i=0; i<edges[cur].size(); i++)
+		{
+			int t = edges[cur][i];
+			int c = edgecost[cur][i];
+			
+			if (done[t] || dist[cur] + c >= dist[t])
+				continue;
+			
+			dist[t] = dist[cur] + c;
+			from[t] = cur;
+			work.push(make_pair(-dist[t], t));
+		}
+	}
+}
+@
+
+\subsubsection{Min-cost Max-flow}
+\begin{tabular}{|l|l|}
+\hline
+Complexity & $O(FEV)$ ($F$ is flow)\\
+\hline
+Timing data & Not available\\
+\hline
+\end{tabular}
+<<maxflow>>=
+pair<int, int> maxflow(int source, int sink)
+{
+	int flow = 0, cost = 0;
+	int n = edges.size();
+	
+	while (1)
+	{
+		bellmanford(source);
+		
+		if (dist[sink] == INF)
+			break;
+		
+		int maxAddFlow = INF;
+		
+		int cur = sink;
+		while (cur != source)
+		{
+			int curFlowLim = 0;
+			for (int i=0; i<edges[from[cur]].size(); i++)
+			{
+				if (edges[from[cur]][i] == cur)
+					curFlowLim = edgecap[from[cur]][i];
+			}
+			
+			if (maxAddFlow > curFlowLim)
+				maxAddFlow = curFlowLim;
+			
+			cur = from[cur];
+		}
+		
+		cost += maxAddFlow*dist[sink];
+		flow += maxAddFlow;
+		
+		cur = sink;
+		while (cur != source)
+		{
+			int *curCap=NULL, *curCost=NULL;
+			
+			for (int i=0; i<edges[from[cur]].size(); i++)
+			{
+				if (edges[from[cur]][i] == cur)
+				{
+					curCap = &edgecap[from[cur]][i];
+					curCost = &edgecost[from[cur]][i];
+				}
+			}
+			
+			*curCap -= maxAddFlow;
+			
+			int *retCap=NULL;
+			
+			for (int i=0; i<edges[cur].size(); i++)
+			{
+				if (edges[cur][i] == from[cur] 
+					&& edgecost[cur][i] == -*curCost)
+				{
+					retCap = &edgecap[cur][i];
+				}
+			}
+			
+			if (retCap != NULL)
+			{
+				*retCap+= maxAddFlow;
+			}
+			else
+			{
+				edges[cur].push_back(from[cur]);
+				edgecap[cur].push_back(maxAddFlow);
+				edgecost[cur].push_back(-(*curCost));
+			}
+			
+			cur = from[cur];
+		}
+	}
+	
+	return make_pair(flow, cost);
+}
+@
+
+\subsubsection{Minimum spanning tree}
+
+<<spanningtree>>=
+int spanningtree()
+{
+	int n = edges.size();
+
+	vector<DTYPE> dist(n, INF);
+	vector<bool> done(n, false);
+	priority_queue<pair<int, int> > work;
+	
+	dist[0] = 0;
+	
+	DTYPE totaldist = 0;
+	
+	while (!work.empty())
+	{
+		int cur = work.top().second;
+		work.pop();
+		
+		if (done[cur])
+			continue;
+		
+		done[cur] = true;
+		totaldist += dist[cur];
+		
+		for (int i=0; i<edges[cur].size(); i++)
+		{
+			int t = edges[cur][i];
+			int c = edgecost[cur][i];
+			
+			if (done[t] || c >= dist[t])
+				continue;
+			
+			dist[t] = c;
+			from[t] = cur;
+			work.push(make_pair(-dist[t], t));
+		}
+	}
+	return totaldist;
+}
+@

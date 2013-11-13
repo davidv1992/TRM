@@ -1,0 +1,70 @@
+\section{Test programs for the graph module}
+
+\subsection{Graph reading module}
+Common graph reading module for graph programs. Start node is left in s.
+
+<<read graph>>=
+int n, e, s;
+scanf("%d %d %d", &n, &e, &s);
+
+edges.clear();
+edges.resize(n, vector<int>(0));
+edgecost.clear();
+edgecost.resize(n, vector<DTYPE>(0));
+
+for (int i=0; i<e; i++)
+{
+	int f, t, c;
+	scanf("%d %d %d", &f, &t, &c);
+	edges[f].push_back(t);
+	edgecost[f].push_back(c);
+}
+@
+
+\subsection{Distance listing module}
+Common module for listing distance results.
+
+<<write distance>>=
+for (int i=0; i<n; i++)
+		printf("%d\n", dist[i]);
+@
+
+\subsection{Test program for dijkstras}
+
+<<dijkstras.cpp>>=
+<<headers>>
+<<graph config>>
+<<graph adjacency>>
+<<graph adjacency distance results>>
+<<dijkstras>>
+int main()
+{
+	<<read graph>>
+	
+	dijkstras(s);
+	
+	<<write distance>>
+	
+	return 0;
+}
+@
+
+\subsection{Test program for bellman-ford}
+
+<<bellmanford.cpp>>=
+<<headers>>
+<<graph config>>
+<<graph adjacency>>
+<<graph adjacency distance results>>
+<<bellmanford>>
+int main()
+{
+	<<read graph>>
+	
+	bellmanford(s);
+	
+	<<write distance>>
+	
+	return 0;
+}
+@
