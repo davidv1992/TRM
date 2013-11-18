@@ -1,0 +1,128 @@
+\section{Test geometrics}
+
+\subsection{Polygon drawing}
+
+<<drawpolygon>>=
+#include <cairo/cairo.h>
+
+void drawPolygon(vector<point> pa, vector<point> pb, const char *destFile)
+{	
+	int minX, maxX, minY, maxY;
+	
+	minX = maxX = pa[0].X;
+	minY = maxY = pa[0].Y;
+	
+	for (int i=1; i<pa.size(); i++)
+	{
+		if (minX > pa[i].X)
+			minX = pa[i].X;
+		if (maxX < pa[i].X)
+			maxX = pa[i].X;
+		if (minY > pa[i].Y)
+			minY = pa[i].Y;
+		if (maxY < pa[i].Y)
+			maxY = pa[i].Y;
+	}
+	
+	for (int i=0; i<pb.size(); i++)
+	{
+		if (minX > pb[i].X)
+			minX = pb[i].X;
+		if (maxX < pb[i].X)
+			maxX = pb[i].X;
+		if (minY > pb[i].Y)
+			minY = pb[i].Y;
+		if (maxY < pb[i].Y)
+			maxY = pb[i].Y;
+	}
+	
+	minX -= 10;
+	maxX += 10;
+	minY -= 10;
+	maxY += 10;
+	
+	cairo_surface_t *surface;
+	cairo_t *cr; 
+	
+	surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, ((double)(maxX - minX)), ((double)(maxY-minY)));
+	cr = cairo_create(surface);
+	
+	cairo_set_source_rgb(cr, 1.0, 1.0, 1.0);
+	cairo_paint(cr);
+	
+	cairo_move_to(cr, ((double)(pa[0].X-minX)), ((double)(pa[0].Y-minY)));
+	for (int i=1; i<pa.size(); i++)
+		cairo_line_to(cr, ((double)(pa[i].X-minX)), ((double)(pa[i].Y-minY)));
+	cairo_close_path(cr);
+	cairo_set_source_rgb(cr, 0.0, 0.0, 0.0);
+	cairo_stroke(cr);
+	
+	cairo_move_to(cr, ((double)(pb[0].X-minX)), ((double)(pb[0].Y-minY)));
+	for (int i=1; i<pa.size(); i++)
+		cairo_line_to(cr, ((double)(pb[i].X-minX)), ((double)(pb[i].Y-minY)));
+	cairo_close_path(cr);
+	cairo_set_source_rgba(cr, 1.0, 0.0, 0.0, 0.5);
+	cairo_stroke(cr);
+	
+	cairo_destroy(cr);
+	cairo_surface_write_to_png(surface, destFile);
+	cairo_surface_destroy(surface);
+}
+@
+
+\subsection{Test voor grahamscan}
+
+<<grahamscan.cpp>>=
+<<headers>>
+<<config geom>>
+<<point>>
+<<STA>>
+<<comparer>>
+<<grahamscan>>
+<<drawpolygon>>
+int main()
+{
+	int N;
+	scanf("%d", &N);
+	vector<point> pol;
+	
+	for (int i=0; i<N; i++)
+	{
+		int x, y;
+		scanf("%d %d", &x, &y);
+		x *= 100;
+		y *= 100;
+		pol.push_back(point(x,y));
+	}
+	
+	drawPolygon(pol, convex_hull(pol), "test.png");
+	
+	return 0;
+}
+@
+
+\subsection{Test voor area}
+
+<<polygon_area.cpp>>=
+<<headers>>
+<<config geom>>
+<<point>>
+<<area>>
+int main()
+{
+	int N;
+	scanf("%d", &N);
+	vector<point> pol;
+	
+	for (int i=0; i<N; i++)
+	{
+		int x, y;
+		scanf("%d %d", &x, &y);
+		pol.push_back(point(x,y));
+	}
+	
+	printf("%d\n", area(pol));
+	
+	return 0;
+}
+@

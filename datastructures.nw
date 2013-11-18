@@ -1,0 +1,53 @@
+\section{Datastructures}
+
+\subsection{Disjoint Union}
+
+\begin{tabular}{|l|l|}
+\hline
+union & $O(\alpha(n))$\\
+\hline
+find & $O(\alpha(n))$\\
+\hline
+\end{tabular}
+
+<<disjointunion data>>=
+vector<int> du_parent;
+vector<int> du_rank;
+@
+
+<<disjointunion>>=
+void init(int n)
+{
+	du_parent.clear();
+	du_parent.resize(n, -1);
+	du_rank.clear();
+	du_rank.resize(n, 0);
+}
+
+int find(int k)
+{
+	if (du_parent[k] == -1)
+		return k;
+	du_parent[k] = find(du_parent[k]);
+	return du_parent[k];
+}
+
+void dunion(int a, int b)
+{
+	a = find(a);
+	b = find(b);
+	if (a == b)
+		return;
+		
+	if (du_rank[a] < du_rank[b])
+	{
+		du_parent[b] = a;
+	}
+	else
+	{
+		du_parent[a] = b;
+		if (du_rank[b] == du_rank[a])
+			du_rank[b]++;
+	}
+}
+@

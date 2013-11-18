@@ -1,0 +1,128 @@
+\section{Geometric algorithms}
+
+<<config geom>>=
+#define CTYPE		int
+#define EPSILON		0
+@
+
+\subsection{Primitives}
+
+<<point>>=
+class point
+{
+public:
+	CTYPE X, Y;
+	point(){}
+	point(int _x, int _y){X = _x; Y = _y;}
+	bool operator<(const point a) const
+	{
+		if (Y < a.Y)
+			return true;
+		if (Y > a.Y)
+			return false;
+		return X < a.X;
+	}
+	bool operator==(const point a) const
+	{
+		return (a.X == X && a.Y == Y);
+	}
+};
+@
+
+\subsection{Primitives}
+
+<<STA>>=
+CTYPE signed_triangle_area(point a, point b, point c)
+{
+	return (a.X*b.Y-b.X*a.Y+a.Y*c.X
+			-a.X*c.Y+b.X*c.Y-c.X*b.Y);
+}
+@
+
+\subsection{Grahamscan}
+
+\begin{tabular}{|l|l|}
+\hline
+Complexity & $O(N\log(N))$\\
+\hline
+\end{tabular}
+
+<<comparer>>=
+class pointComparer
+{
+	point base;
+public:
+	pointComparer(point b)
+	{
+		base = b;
+	}
+	bool operator()(point a, point b)
+	{
+		CTYPE ang = signed_triangle_area(base, a, b);
+		
+		if (abs(ang) <= EPSILON)
+			return ((base.X-a.X)*(base.X-a.X)+(base.Y-a.Y)*(base.Y-a.Y) <
+					(base.X-b.X)*(base.X-b.X)+(base.Y-a.Y)*(base.Y-a.Y));
+		else
+			return (ang > EPSILON);
+	}
+};
+@
+
+<<grahamscan>>=
+vector<point> convex_hull(vector<point> pol)
+{
+	if (pol.size() <= 3)
+		return pol;
+	
+	sort(pol.begin(), pol.end());
+	unique(pol.begin(), pol.end());
+	sort(pol.begin()+1, pol.end(), pointComparer(pol[0]));
+	
+	vector<point> hull;
+	
+	hull.push_back(pol[0]);
+	hull.push_back(pol[1]);
+	
+	pol.push_back(pol[0]);
+	
+	int i=2;
+	
+	while (i < pol.size())
+	{
+		if (signed_triangle_area(hull[hull.size()-2], hull[hull.size()-1], pol[i]) <= EPSILON)
+			hull.pop_back();
+		else
+		{
+			hull.push_back(pol[i]);
+			i++;
+		}
+	}
+	
+	return hull;
+}
+@
+
+\subsection{Area}
+
+\begin{tabular}{|l|l|}
+\hline
+Complexity & $O(N)$\\
+\hline
+\end{tabular}
+
+<<area>>=
+CTYPE area(vector<point> pol)
+{
+	CTYPE total = 0;
+	
+	for (int i=0; i<pol.size()-1; i++)
+	{
+		total += pol[i].X*pol[i+1].Y-pol[i].Y*pol[i+1].X;
+	}
+	
+	total += pol[pol.size()-1].X*pol[0].Y-pol[pol.size()-1].Y*pol[0].X;
+	
+	return (total/2.0);
+}
+@

@@ -5,6 +5,7 @@ We have some common configuration settings
 <<graph config>>=
 #define DTYPE int
 #define INF (1<<30)
+#define EXTRA_CHECK
 @
 
 \subsection{Adjacency list}
@@ -20,7 +21,7 @@ vector<vector<DTYPE> > edgecost;
 The adjacency list distance algorithms return their results in the following: From gives the node that is the predecessor of this node in the route from start, dist the distance from the start node to this node.
 
 <<graph adjacency distance results>>=
-vector<int> from;
+vector<pair<int, int> > from;
 vector<DTYPE> dist;
 @
 
@@ -29,7 +30,7 @@ vector<DTYPE> dist;
 \hline
 Complexity & $O(VE)$\\
 \hline
-Timing data & not available\\
+Timing data & $44.433$s ($V=10^5$, $E=10^6$)\\
 \hline
 \end{tabular}
 
@@ -39,7 +40,7 @@ void bellmanford(int start)
 	int n = edges.size();
 	
 	from.clear();
-	from.resize(n, -1);
+	from.resize(n, make_pair(-1,0));
 	dist.clear();
 	dist.resize(n, INF);
 	
@@ -53,11 +54,12 @@ void bellmanford(int start)
 			{
 				int t = edges[f][j];
 				int cost = edgecost[f][j];
+				EXTRA_CHECK
 				
 				if (dist[t] > dist[f] + cost)
 				{
 					dist[t] = dist[f] + cost;
-					from[t] = f;
+					from[t] = make_pair(f,j);
 				}
 			}
 		}
@@ -70,7 +72,7 @@ void bellmanford(int start)
 \hline
 Complexity & $O(E\log{V})$\\
 \hline
-Timing data & Not available\\
+Timing data & $0.151$s ($V=10^5$, $E=10^6$)\\
 \hline
 \end{tabular}
 
@@ -85,10 +87,9 @@ void dijkstras(int start)
 	dist.clear();
 	dist.resize(NODES, INF);
 	from.clear();
-	from.resize(NODES, -1);
+	from.resize(NODES, make_pair(-1,0));
 	
 	dist[start] = 0;
-	from[start] = -1;
 	work.push(make_pair(0, start));
 	
 	while (!work.empty())
@@ -110,14 +111,14 @@ void dijkstras(int start)
 				continue;
 			
 			dist[t] = dist[cur] + c;
-			from[t] = cur;
+			from[t] = make_pair(cur,i);
 			work.push(make_pair(-dist[t], t));
 		}
 	}
 }
 @
 
-\subsubsection{Min-cost Max-flow}
+\subsubsection{Mincost Maxflow}
 \begin{tabular}{|l|l|}
 \hline
 Complexity & $O(FEV)$ ($F$ is flow)\\
@@ -125,6 +126,17 @@ Complexity & $O(FEV)$ ($F$ is flow)\\
 Timing data & Not available\\
 \hline
 \end{tabular}
+
+<<maxflow graphdata>>=
+vector<vector<CTYPE> > edgecap;
+@
+
+<<maxflow config>>=
+#undef EXTRA_CHECK
+#define EXTRA_CHECK if (edgecap[f][j] == 0) continue;
+#define CTYPE int
+@
+
 <<maxflow>>=
 pair<int, int> maxflow(int source, int sink)
 {
@@ -144,16 +156,12 @@ pair<int, int> maxflow(int source, int sink)
 		while (cur != source)
 		{
 			int curFlowLim = 0;
-			for (int i=0; i<edges[from[cur]].size(); i++)
-			{
-				if (edges[from[cur]][i] == cur)
-					curFlowLim = edgecap[from[cur]][i];
-			}
+			curFlowLim = edgecap[from[cur].first][from[cur].second];
 			
 			if (maxAddFlow > curFlowLim)
 				maxAddFlow = curFlowLim;
 			
-			cur = from[cur];
+			cur = from[cur].first;
 		}
 		
 		cost += maxAddFlow*dist[sink];
@@ -164,14 +172,8 @@ pair<int, int> maxflow(int source, int sink)
 		{
 			int *curCap=NULL, *curCost=NULL;
 			
-			for (int i=0; i<edges[from[cur]].size(); i++)
-			{
-				if (edges[from[cur]][i] == cur)
-				{
-					curCap = &edgecap[from[cur]][i];
-					curCost = &edgecost[from[cur]][i];
-				}
-			}
+			curCap = &edgecap[from[cur].first][from[cur].second];
+			curCost = &edgecost[from[cur].first][from[cur].second];
 			
 			*curCap -= maxAddFlow;
 			
@@ -179,7 +181,7 @@ pair<int, int> maxflow(int source, int sink)
 			
 			for (int i=0; i<edges[cur].size(); i++)
 			{
-				if (edges[cur][i] == from[cur] 
+				if (edges[cur][i] == from[cur].first 
 					&& edgecost[cur][i] == -*curCost)
 				{
 					retCap = &edgecap[cur][i];
@@ -192,12 +194,12 @@ pair<int, int> maxflow(int source, int sink)
 			}
 			else
 			{
-				edges[cur].push_back(from[cur]);
+				edges[cur].push_back(from[cur].first);
 				edgecap[cur].push_back(maxAddFlow);
 				edgecost[cur].push_back(-(*curCost));
 			}
 			
-			cur = from[cur];
+			cur = from[cur].first;
 		}
 	}
 	
@@ -212,11 +214,15 @@ int spanningtree()
 {
 	int n = edges.size();
 
-	vector<DTYPE> dist(n, INF);
+	dist.clear();
+	dist.resize(n, INF);
 	vector<bool> done(n, false);
+	from.clear();
+	from.resize(n, make_pair(-1,0));
 	priority_queue<pair<int, int> > work;
 	
 	dist[0] = 0;
+	work.push(make_pair(0, 0));
 	
 	DTYPE totaldist = 0;
 	
@@ -240,10 +246,116 @@ int spanningtree()
 				continue;
 			
 			dist[t] = c;
-			from[t] = cur;
+			from[t] = make_pair(cur, i);
 			work.push(make_pair(-dist[t], t));
 		}
 	}
 	return totaldist;
 }
 @
+
+\subsubsection{Tarjans algorithm}
+
+\begin{tabular}{|l|l|}
+\hline
+Complexity & $O(V^3)$\\
+\hline
+\end{tabular}
+
+Usage notes: To use for 2sat, make two arrows per clause (a,b), namely an arrow
+$\not a\rightarrow b$ and $\not b\rightarrow a$, then run tarjan, and check whether
+there is any $a$ for which $a$ and $\not a$ are in the same component.
+
+<<tarjan data>>=
+vector<int> tj_index;
+vector<int> lowlink;
+vector<bool> onstack;
+stack<int> nodestack;
+vector<vector<int> > components;
+int index_c;
+@
+
+<<tarjan>>=
+void strongcomponent(int v)
+{
+	tj_index[v] = index_c++;
+	lowlink[v] = tj_index[v];
+	onstack[v] = true;
+	nodestack.push(v);
+	
+	for (int i=0; i<edges[v].size(); i++)
+	{
+		if (tj_index[edges[v][i]] == -1)
+		{
+			strongcomponent(edges[v][i]);
+			lowlink[v] = min(lowlink[v], lowlink[edges[v][i]]);
+		}
+		else if (onstack[edges[v][i]])
+		{
+			lowlink[v] = min(lowlink[v], tj_index[edges[v][i]]);
+		}
+	}
+	
+	if (lowlink[v] == tj_index[v])
+	{
+		components.push_back(vector<int>(0));
+		int w = -1;
+		while (w != v)
+		{
+			w = nodestack.top();
+			nodestack.pop();
+			components.back().push_back(w);
+			dunion(w,v);
+		}
+	}
+}
+@
+
+<<tarjan>>=
+void tarjan()
+{
+	int n = edges.size();
+	init(n);
+	tj_index.clear();
+	tj_index.resize(n, -1);
+	lowlink.clear();
+	lowlink.resize(n,0);
+	onstack.clear();
+	onstack.resize(n,false);
+	while (!nodestack.empty())
+		nodestack.pop();
+	components.clear();
+	index_c = 0;
+	
+	for (int i=0; i<n; i++)
+	{
+		if (tj_index[i] == -1)
+			strongcomponent(i);
+	}
+}
+@
+
+\subsection{Matrix representation}
+
+<<matrix graph>>=
+vector<vector<DTYPE> > dist;
+@
+
+\subsubsection{Floyd-warshall}
+
+\begin{tabular}{|l|l|}
+\hline
+Complexity & $O(V^3)$\\
+\hline
+\end{tabular}
+
+<<floydwarshall>>=
+void floydwarshall()
+{
+	int n = dist.size();
+	for (int k=0; k<n; k++)
+		for (int i=0; i<n; i++)
+			for (int j=0; j<n; j++)
+				if (dist[i][k] != INF && dist[k][j] != INF)
+					dist[i][j] = min(dist[i][j], dist[i][k]+dist[k][j]);
+}
