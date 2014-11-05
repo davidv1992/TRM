@@ -62,7 +62,7 @@ public:
 		
 		if (abs(ang) <= EPSILON)
 			return ((base.X-a.X)*(base.X-a.X)+(base.Y-a.Y)*(base.Y-a.Y) <
-					(base.X-b.X)*(base.X-b.X)+(base.Y-a.Y)*(base.Y-a.Y));
+					(base.X-b.X)*(base.X-b.X)+(base.Y-b.Y)*(base.Y-b.Y));
 		else
 			return (ang > EPSILON);
 	}
@@ -76,7 +76,7 @@ vector<point> convex_hull(vector<point> pol)
 		return pol;
 	
 	sort(pol.begin(), pol.end());
-	unique(pol.begin(), pol.end());
+	pol.erase(unique(pol.begin(), pol.end()), pol.end());
 	sort(pol.begin()+1, pol.end(), pointComparer(pol[0]));
 	
 	vector<point> hull;
@@ -90,7 +90,8 @@ vector<point> convex_hull(vector<point> pol)
 	
 	while (i < pol.size())
 	{
-		if (signed_triangle_area(hull[hull.size()-2], hull[hull.size()-1], pol[i]) <= EPSILON)
+		if (signed_triangle_area(hull[hull.size()-2], hull[hull.size()-1], pol[i]) 
+			<= EPSILON)
 			hull.pop_back();
 		else
 		{

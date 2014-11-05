@@ -25,3 +25,28 @@ This template includes all the important headers.
 
 using namespace std;
 @
+
+<<harness>>=
+void doCase()
+{
+}
+
+int main()
+{
+	int T;
+	cin >> T;
+	for (int i=0; i<T; i++)
+		doCase()
+	return 0;
+}
+@
+
+The following setting changes need to be applied to gedits settings:
+tabview:\\
+	- turn on display line numbers\\
+	- turn on highlight matching brackets\\
+tabeditor:\\
+	- tab width 4\\
+	- turn on enable automatic indentation\\
+	- turn on autosave files every 10 minutes
+
