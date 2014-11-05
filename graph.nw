@@ -1,6 +1,6 @@
 \section{Graph algorithms}
 
-We have some common configuration settings
+We have some common configuration settings.
 
 <<graph config>>=
 #define DTYPE int
@@ -10,7 +10,7 @@ We have some common configuration settings
 
 \subsection{Adjacency list}
 
-The adjecency list representation: Edges gives the destination node of each edge, edgecost the length
+The adjecency list representation: Edges gives the destination node of each edge, edgecost the length.
 
 <<graph adjacency>>=
 vector<vector<int> > edges;
@@ -39,10 +39,8 @@ void bellmanford(int start)
 {
 	int n = edges.size();
 	
-	from.clear();
-	from.resize(n, make_pair(-1,0));
-	dist.clear();
-	dist.resize(n, INF);
+	from.assign(n, make_pair(-1,0));
+	dist.assign(n, INF);
 	
 	dist[start] = 0;
 	
@@ -84,10 +82,8 @@ void dijkstras(int start)
 	priority_queue<pair<int, int> > work;
 	vector<bool> done(NODES, false);
 	
-	dist.clear();
-	dist.resize(NODES, INF);
-	from.clear();
-	from.resize(NODES, make_pair(-1,0));
+	dist.assign(NODES,INF);
+	from.assign(NODES, make_pair(-1,0));
 	
 	dist[start] = 0;
 	work.push(make_pair(0, start));
@@ -110,6 +106,8 @@ void dijkstras(int start)
 			if (done[t] || dist[cur] + c >= dist[t])
 				continue;
 			
+			EXTRA_CHECK
+			
 			dist[t] = dist[cur] + c;
 			from[t] = make_pair(cur,i);
 			work.push(make_pair(-dist[t], t));
@@ -118,88 +116,86 @@ void dijkstras(int start)
 }
 @
 
-\subsubsection{Mincost Maxflow}
+\subsubsection{Mincost maxflow}
 \begin{tabular}{|l|l|}
 \hline
-Complexity & $O(FEV)$ ($F$ is flow)\\
+Complexity & $O(FE\log{V})$ ($F$ is flow)\\
 \hline
-Timing data & Not available\\
+Timing data & $0.5$s ($V=1000$, $E=10000$)\\
 \hline
 \end{tabular}
 
 <<maxflow graphdata>>=
 vector<vector<CTYPE> > edgecap;
+vector<DTYPE> pot;
 @
 
 <<maxflow config>>=
 #undef EXTRA_CHECK
-#define EXTRA_CHECK if (edgecap[f][j] == 0) continue;
+#define EXTRA_CHECK if (edgecap[cur][i] == 0) continue;
 #define CTYPE int
+#define CINF (1 << 30)
 @
 
 <<maxflow>>=
 pair<int, int> maxflow(int source, int sink)
 {
-	int flow = 0, cost = 0;
 	int n = edges.size();
+	int flow = 0, cost = 0;
+	pot.assign(n,0);
+	vector<vector<int> > medge(0);
+	for (int i=0; i<n; i++)
+		medge.push_back(vector<int >(edges[i].size(), -1));
 	
 	while (1)
 	{
-		bellmanford(source);
+		dijkstras(source);
 		
 		if (dist[sink] == INF)
 			break;
 		
-		int maxAddFlow = INF;
-		
+		// find maxadd
+		CTYPE maxadd = CINF;
 		int cur = sink;
 		while (cur != source)
 		{
-			int curFlowLim = 0;
-			curFlowLim = edgecap[from[cur].first][from[cur].second];
-			
-			if (maxAddFlow > curFlowLim)
-				maxAddFlow = curFlowLim;
-			
+			maxadd = min(maxadd, edgecap[from[cur].first][from[cur].second]);
 			cur = from[cur].first;
 		}
 		
-		cost += maxAddFlow*dist[sink];
-		flow += maxAddFlow;
+		cost += (pot[sink] + dist[sink])*maxadd;
+		flow += maxadd;
 		
+		// potential adjust
+		for (int i=0; i<n; i++)
+		{
+			for (int j=0; j<edges[i].size(); j++)
+			{
+				edgecost[i][j] += dist[i] - dist[edges[i][j]];
+			}
+			pot[i] += dist[i];
+		}
+		
+		// adjust edges
 		cur = sink;
 		while (cur != source)
 		{
-			int *curCap=NULL, *curCost=NULL;
-			
-			curCap = &edgecap[from[cur].first][from[cur].second];
-			curCost = &edgecost[from[cur].first][from[cur].second];
-			
-			*curCap -= maxAddFlow;
-			
-			int *retCap=NULL;
-			
-			for (int i=0; i<edges[cur].size(); i++)
+			int f = from[cur].first;
+			int j = from[cur].second;
+			edgecap[f][j] -= maxadd;
+			if (medge[f][j] == -1)
 			{
-				if (edges[cur][i] == from[cur].first 
-					&& edgecost[cur][i] == -*curCost)
-				{
-					retCap = &edgecap[cur][i];
-				}
-			}
-			
-			if (retCap != NULL)
-			{
-				*retCap+= maxAddFlow;
+				medge[f][j] = edges[cur].size();
+				medge[cur].push_back(j);
+				edges[cur].push_back(f);
+				edgecost[cur].push_back(0);
+				edgecap[cur].push_back(maxadd);
 			}
 			else
 			{
-				edges[cur].push_back(from[cur].first);
-				edgecap[cur].push_back(maxAddFlow);
-				edgecost[cur].push_back(-(*curCost));
+				edgecap[cur][medge[f][j]] += maxadd;
 			}
-			
-			cur = from[cur].first;
+			cur = f;
 		}
 	}
 	
@@ -208,17 +204,19 @@ pair<int, int> maxflow(int source, int sink)
 @
 
 \subsubsection{Minimum spanning tree}
-
+\begin{tabular}{|l|l|}
+\hline
+Complexity & $O((E+V)\log{V})$\\
+\hline
+\end{tabular}
 <<spanningtree>>=
 int spanningtree()
 {
 	int n = edges.size();
 
-	dist.clear();
-	dist.resize(n, INF);
+	dist.assign(n,INF);
 	vector<bool> done(n, false);
-	from.clear();
-	from.resize(n, make_pair(-1,0));
+	from.assign(n, make_pair(-1,0));
 	priority_queue<pair<int, int> > work;
 	
 	dist[0] = 0;
@@ -258,22 +256,13 @@ int spanningtree()
 
 \begin{tabular}{|l|l|}
 \hline
-Complexity & $O(V^3)$\\
+Complexity & $O(V+E)$\\
 \hline
 \end{tabular}
 
 Usage notes: To use for 2sat, make two arrows per clause (a,b), namely an arrow
-$\not a\rightarrow b$ and $\not b\rightarrow a$, then run tarjan, and check whether
-there is any $a$ for which $a$ and $\not a$ are in the same component.
-
-<<tarjan data>>=
-vector<int> tj_index;
-vector<int> lowlink;
-vector<bool> onstack;
-stack<int> nodestack;
-vector<vector<int> > components;
-int index_c;
-@
+$\neg a\rightarrow b$ and $\neg b\rightarrow a$, then run tarjan, and check whether
+there is any $a$ for which $a$ and $\neg a$ are in the same component.
 
 <<tarjan>>=
 void strongcomponent(int v)
@@ -311,17 +300,23 @@ void strongcomponent(int v)
 }
 @
 
+<<tarjan data>>=
+vector<int> tj_index;
+vector<int> lowlink;
+vector<bool> onstack;
+stack<int> nodestack;
+vector<vector<int> > components;
+int index_c;
+@
+
 <<tarjan>>=
 void tarjan()
 {
 	int n = edges.size();
 	init(n);
-	tj_index.clear();
-	tj_index.resize(n, -1);
-	lowlink.clear();
-	lowlink.resize(n,0);
-	onstack.clear();
-	onstack.resize(n,false);
+	tj_index.assign(n,-1);
+	lowlink.assign(n,0);
+	onstack.assign(n,false);
 	while (!nodestack.empty())
 		nodestack.pop();
 	components.clear();
@@ -341,7 +336,7 @@ void tarjan()
 vector<vector<DTYPE> > dist;
 @
 
-\subsubsection{Floyd-warshall}
+\subsubsection{Floyd-Warshall}
 
 \begin{tabular}{|l|l|}
 \hline
@@ -359,3 +354,152 @@ void floydwarshall()
 				if (dist[i][k] != INF && dist[k][j] != INF)
 					dist[i][j] = min(dist[i][j], dist[i][k]+dist[k][j]);
 }
+@
+
+\subsection{Hungarian algorithm}
+
+\begin{tabular}{|l|l|}
+\hline
+Complexity & $O(N^3)$\\
+\hline
+\end{tabular}
+
+Find maximal matching between two sets, dist[x][y] is interpreted as the value of matching x to y.
+DIST SHOULD BE SQUARE!
+
+<<hungarian data>>=
+vector<int> lx, ly, xy, yx;
+vector<bool> S,T;
+vector<int> slack, slackx, prev;
+@
+
+<<update labels>>=
+void update_labels()
+{
+	int n = dist.size();
+	int delta = INF;
+	for (int y=0; y<n; y++)
+		if (!T[y])
+			delta = min(delta, slack[y]);
+	for (int x=0; x<n; x++)
+		if (S[x])
+			lx[x] -= delta;
+	for (int y=0; y<n; y++)
+	{
+		if (T[y])
+			ly[y] += delta;
+		else
+			slack[y] -= delta;
+	}
+}
+@
+
+
+<<add to tree>>=
+void add_to_tree(int x, int prevx)
+{
+	int n = dist.size();
+	S[x] = true;
+	prev[x] = prevx;
+	for (int y=0; y<n; y++)
+	{
+		if (lx[x] + ly[y]-dist[x][y] < slack[y])
+		{
+			slack[y] = lx[x]+ly[y]-dist[x][y];
+			slackx[y] = x;
+		}
+	}
+}
+@
+
+<<hungarian>>=
+void hungarian()
+{
+	int max_match = 0;
+	int n = dist.size();
+	xy.assign(n, -1);
+	yx.assign(n, -1);
+	lx.assign(n, 0);
+	ly.assign(n, 0);
+	slack.resize(n);
+	slackx.resize(n);
+	int x,y,root;
+	for (x=0; x<n; x++)
+		for (y=0; y<n; y++)
+			lx[x] = max(lx[x], dist[x][y]);
+	queue<int> q;
+	while (max_match != n)
+	{
+		S.assign(n, false);
+		T.assign(n, false);
+		prev.assign(n, -1);
+		while (!q.empty()) q.pop();
+		for (x=0; x<n; x++)
+		{
+			if (xy[x] == -1)
+			{
+				q.push(x);
+				root = x;
+				prev[x] = -2;
+				S[x] = true;
+				break;
+			}
+		}
+		for (y=0; y<n; y++)
+		{
+			slack[y] = lx[root]+ly[y]-dist[root][y];
+			slackx[y] = root;
+		}
+		while (true)
+		{
+			while (!q.empty())
+			{
+				x = q.front();
+				q.pop();
+				for (y=0; y<n; y++)
+				{
+					if (dist[x][y] == lx[x]+ly[y] && !T[y])
+					{
+						if (yx[y] == -1)
+							goto hml_break;
+						T[y] = true;
+						q.push(yx[y]);
+						add_to_tree(yx[y],x);
+					}
+				}
+			}
+			
+			update_labels();
+			for (y=0; y<n; y++)
+			{
+				if (!T[y] && slack[y] == 0)
+				{
+					if (yx[y] == -1)
+					{
+						x = slackx[y];
+						goto hml_break;
+					}
+					else
+					{
+						T[y] = true;
+						if (!S[yx[y]])
+						{
+							q.push(yx[y]);
+							add_to_tree(yx[y],slackx[y]);
+						}
+					}
+				}
+			}
+		}
+		return;
+		hml_break:
+		max_match++;
+		for (int cx=x, cy=y, ty; cx != -2; cx = prev[cx], cy = ty)
+		{
+			ty = xy[cx];
+			yx[cy] = cx;
+			xy[cx] = cy;
+		}
+	}
+}
+@

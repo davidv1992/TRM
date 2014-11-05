@@ -108,6 +108,46 @@ int main()
 }
 @
 
+\subsection{Alternative test program for minspan}
+
+<<minspan2.cpp>>=
+<<headers>>
+<<disjointunion data>>
+<<disjointunion>>
+
+int main()
+{
+	vector<pair<int, pair<int, int> > > edges;
+	
+	int n, e;
+	scanf("%d %d", &n, &e);
+	
+	for (int i=0; i<e; i++)
+	{
+		int f,t,c;
+		scanf("%d %d %d", &f, &t, &c);
+		edges.push_back(make_pair(c, make_pair(f,t)));
+	}
+	
+	sort(edges.begin(), edges.end());
+	init(n);
+	
+	int totlen = 0;
+	
+	for (int i=0; i<e; i++)
+	{
+		if (find(edges[i].second.first) != find(edges[i].second.second))
+		{
+			dunion(edges[i].second.first, edges[i].second.second);
+			totlen += edges[i].first;
+		}
+	}
+	
+	printf("%d\n", totlen);
+	return 0;
+}
+@
+
 \subsection{Test program for maxflow}
 
 <<maxflow.cpp>>=
@@ -117,7 +157,7 @@ int main()
 <<graph adjacency>>
 <<maxflow graphdata>>
 <<graph adjacency distance results>>
-<<bellmanford>>
+<<dijkstras>>
 <<maxflow>>
 
 int main()
@@ -148,6 +188,7 @@ int main()
 	return 0;
 }
 @
+
 
 \subsection{Test program floyd-warshall}
 
@@ -235,3 +276,31 @@ int main()
 }
 @
 
+\subsection{Test program hungarian}
+<<hungarian.cpp>>=
+<<headers>>
+<<graph config>>
+<<matrix graph>>
+<<hungarian data>>
+<<update labels>>
+<<add to tree>>
+<<hungarian>>
+int main()
+{
+	int n;
+	scanf("%d", &n);
+	dist.assign(n, vector<int>(n,0));
+	for (int i=0; i<n; i++)
+	{
+		for (int j=0; j<n; j++)
+		{
+			scanf("%d", &dist[i][j]);
+		}
+	}
+	hungarian();
+	int sum = 0;
+	for (int i=0; i<n; i++)
+		sum += dist[i][xy[i]];
+	printf("%d\n", sum);
+	return 0;
+}

@@ -1,0 +1,27 @@
+\section{Big number tests}
+
+\subsection{Test program for basic arithmetic}
+
+<<bignum.cpp>>=
+<<headers>>
+<<prim add>>
+<<prim sub>>
+<<bignum>>
+int main()
+{
+	bignum a, b;
+	a.read();
+	int c=' ';
+	while (isspace(c))
+		c=getchar();
+	ungetc(c, stdin);
+	b.read();
+	(a+b).print();
+	printf("\n");
+	(a-b).print();
+	printf("\n");
+	(a*b).print();
+	printf("\n");
+	return 0;
+}
+@

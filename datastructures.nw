@@ -1,6 +1,6 @@
 \section{Datastructures}
 
-\subsection{Disjoint Union}
+\subsection{Disjoint union}
 
 \begin{tabular}{|l|l|}
 \hline
@@ -18,10 +18,8 @@ vector<int> du_rank;
 <<disjointunion>>=
 void init(int n)
 {
-	du_parent.clear();
-	du_parent.resize(n, -1);
-	du_rank.clear();
-	du_rank.resize(n, 0);
+	du_parent.assign(n,-1);
+	du_rank.assign(n,0);
 }
 
 int find(int k)

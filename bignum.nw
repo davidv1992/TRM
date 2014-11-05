@@ -1,0 +1,270 @@
+\section{Big number arithmetics}
+
+\begin{tabular}{|l|l|}
+\hline
+Add & $O(log N)$\\
+\hline
+Sub & $O(log N)$\\
+\hline
+Mul & $O(log^2 N)$\\
+\hline
+IO & $O(log N)$\\
+\hline
+\end{tabular}
+
+Signed big integer arithmetic. Sign is stored in all limbs.
+
+<<bignum>>=
+class bignum
+{
+private:
+	vector<int> limbs;
+	bool sign;
+public:
+	bignum()
+	{
+		sign = false;
+	}
+	bignum(int a)
+	{
+		if (a < 0)
+		{
+			sign = true;
+			a = -a;
+		}
+		
+		while (a)
+		{
+			limbs.push_back(a % 10000);
+			a /= 10000;
+		}
+	}
+	<<bignum normalize>>
+	<<bignum add>>
+	<<bignum sub>>
+	<<bignum neg>>
+	<<bignum mul>>
+	<<bignum print>>
+	<<bignum read>>
+};
+@
+
+\subsection{Normalization}
+<<bignum normalize>>=
+void normalize()
+{
+	size_t tlen = limbs.size();
+	if (tlen != 0 && limbs[tlen-1] < 0)
+	{
+		sign = !sign;
+		int borrow = 0;
+		for (int i=0; i<tlen; i++)
+		{
+			limbs[i] = -limbs[i] - borrow;
+			if (limbs[i] < 0)
+			{
+				limbs[i] += 10000;
+				borrow = 1;
+			}
+			else
+			{
+				borrow = 0;
+			}
+		}
+	}
+	while (tlen != 0 && limbs[tlen-1] == 0)
+		tlen--;
+	limbs.resize(tlen);
+}
+@
+
+\subsection{Lowlevel primitives}
+These are the actual functions for addition and substraction, with carrying but without dealing with negative results.
+
+<<prim add>>=
+vector<int> prim_add(vector<int> a, vector<int> b)
+{
+	size_t siz = max(a.size(), b.size());
+	vector<int> c;
+	c.reserve(siz+1);
+	int carry=0;
+	a.resize(siz, 0);
+	b.resize(siz, 0);
+	for (int i=0; i<siz; i++)
+	{
+		c.push_back(a[i]+b[i]+carry);
+		if (c.back() >= 10000)
+		{
+			c.back() -= 10000;
+			carry=1;
+		}
+		else
+		{
+			carry=0;
+		}
+	}
+	if (carry)
+		c.push_back(carry);
+	return c;
+}
+@
+
+<<prim sub>>=
+vector<int> prim_sub(vector<int> a, vector<int> b)
+{
+	size_t siz = max(a.size(), b.size());
+	vector<int> c;
+	c.reserve(siz+1);
+	int borrow=0;
+	a.resize(siz, 0);
+	b.resize(siz, 0);
+	for (int i=0; i<siz; i++)
+	{
+		c.push_back(a[i]-b[i]+borrow);
+		if (c.back() < 0)
+		{
+			c.back() += 10000;
+			borrow = -1;
+		}
+		else
+		{
+			borrow = 0;
+		}
+	}
+	if (borrow)
+		c.push_back(borrow);
+	return c;
+}
+@
+
+\subsection{Addition}
+<<bignum add>>=
+bignum operator+(bignum b)
+{
+	bignum res;
+	res.sign = sign;
+	if (sign == b.sign)
+		res.limbs = prim_add(limbs, b.limbs);
+	else
+		res.limbs = prim_sub(limbs, b.limbs);
+	res.normalize();
+	return res;
+}
+@
+
+\subsection{Substraction}
+<<bignum sub>>=
+bignum operator-(bignum b)
+{
+	bignum res;
+	res.sign = sign;
+	if (sign == b.sign)
+		res.limbs = prim_sub(limbs, b.limbs);
+	else
+		res.limbs = prim_add(limbs, b.limbs);
+	res.normalize();
+	return res;
+}
+@
+
+\subsection{Negation}
+<<bignum neg>>=
+bignum operator-()
+{
+	bignum res;
+	res.sign = !sign;
+	res.limbs = limbs;
+	return res;
+}
+@
+
+\subsection{Multiplication}
+<<bignum mul>>=
+bignum operator*(bignum b)
+{
+	bignum res;
+	size_t siz = limbs.size() + b.limbs.size();
+	res.limbs.resize(siz, 0);
+	res.sign = (sign != b.sign);
+	for (int i=0; i<limbs.size(); i++)
+	{
+		int carry = 0;
+		for (int j=0; j<b.limbs.size(); j++)
+		{
+			res.limbs[i+j] += carry+limbs[i]*b.limbs[j];
+			carry = res.limbs[i+j]/10000;
+			res.limbs[i+j] %= 10000;
+		}
+		res.limbs[i+b.limbs.size()] = carry;
+		
+	}
+	res.normalize();
+	return res;
+}
+@
+
+\subsection{IO}
+
+<<bignum print>>=
+void print()
+{
+	if (limbs.size() == 0)
+	{
+		printf("0");
+		return;
+	}
+	if (sign)
+		printf("-");
+	printf("%d", limbs.back());
+	for (int k=limbs.size()-2; k>=0; k--)
+		printf("%04d", limbs[k]);
+}
+@
+
+<<bignum read>>=
+void read()
+{
+	stack<int> ls;
+	int c = getchar();
+	if (c == '-')
+		sign = true;
+	else
+		ungetc(c, stdin);
+	int missing = 0;
+	while (true)
+	{
+		int read = 0, res=0;
+		for (int i=0; i<4; i++)
+		{
+			int c = getchar();
+			if (c < '0' || c > '9')
+			{
+				ungetc(c, stdin);
+				break;
+			}
+			read++;
+			res = res*10 + (c-'0');
+		}
+		if (read == 0)
+			break;
+		ls.push(res);
+		if (read == 4)
+			continue;
+		missing = 4-read;
+		break;
+	}
+	int div=1;
+	for (int i=0; i<missing; i++) div *= 10;
+	limbs.reserve(ls.size());
+	int prev = ls.top();
+	ls.pop();
+	while(!ls.empty())
+	{
+		limbs.push_back((ls.top()%div)*(10000/div) + prev);
+		prev = ls.top()/div;
+		ls.pop();
+	}
+	limbs.push_back(prev);
+	normalize();
+}
+@

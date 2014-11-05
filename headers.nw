@@ -1,3 +1,6 @@
+\def\nwendcode{\endtrivlist \endgroup}
+\let\nwdocspar=\par
+
 \section{Default template}
 
 This template includes all the important headers.
