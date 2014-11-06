@@ -116,6 +116,99 @@ void dijkstras(int start)
 }
 @
 
+\subsubsection{Maxflow}
+\begin{tabular}{|l|l|}
+\hline
+Complexity & $O(FE\log{V})$ ($F$ is flow)\\
+\hline
+\end{tabular}
+
+<<dijkstras minnorm>>=
+void dijkstras(int start)
+{
+	int NODES = edges.size();
+	
+	priority_queue<pair<int, int> > work;
+	vector<bool> done(NODES, false);
+	
+	dist.assign(NODES,0);
+	from.assign(NODES, make_pair(-1,0));
+	
+	dist[start] = INF;
+	work.push(make_pair(0, start));
+	
+	while (!work.empty())
+	{
+		int cur = work.top().second;
+		work.pop();
+		
+		if (done[cur])
+			continue;
+		
+		done[cur] = true;
+		
+		for (int i=0; i<edges[cur].size(); i++)
+		{
+			int t = edges[cur][i];
+			int c = edgecost[cur][i];
+			
+			if (done[t] || min(dist[cur], c) >= dist[t])
+				continue;
+			
+			EXTRA_CHECK
+			
+			dist[t] = min(dist[cur], c);
+			from[t] = make_pair(cur,i);
+			work.push(make_pair(dist[t], t));
+		}
+	}
+}
+@
+
+<<base maxflow>>=
+int maxflow(int source, int sink)
+{
+	int n = edges.size();
+	int flow = 0;
+	vector<vector<int> > medge(0);
+	for (int i=0; i<n; i++)
+		medge.push_back(vector<int>(edges[i].size(),-1));
+	
+	while (1)
+	{
+		dijkstras(source);
+		
+		if (dist[sink] == 0)
+			break;
+		
+		flow += dist[sink];
+		
+		// adjust edges
+		int cur = sink;
+		while (cur != source)
+		{
+			int f = from[cur].first;
+			int j = from[cur].second;
+			edgecost[f][j] -= dist[sink];
+			if (medge[f][j] == -1)
+			{
+				medge[f][j] = edges[cur].size();
+				medge[cur].push_back(j);
+				edges[cur].push_back(f);
+				edgecost[cur].push_back(dist[sink]);
+			}
+			else
+			{
+				edgecost[cur][medge[f][j]] += dist[sink];
+			}
+			cur = f;
+		}
+	}
+	
+	return flow;
+}
+@
+
 \subsubsection{Mincost maxflow}
 \begin{tabular}{|l|l|}
 \hline

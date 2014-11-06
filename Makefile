@@ -15,11 +15,14 @@ content.pdf: Makefile content.tex
 content.tex: Makefile headers.nw graph.nw geometrics.nw datastructures.nw bignum.nw
 	noweave -t4 headers.nw graph.nw geometrics.nw datastructures.nw bignum.nw > content.tex
 
-test: test_mf test_mt test_sp test_ts bignum grahamscan polygon_area hungarian
+test: test_mf test_mt test_sp test_ts test_mfs bignum grahamscan polygon_area hungarian
 	echo Please manually test bignum, hungarian, polygon_area and grahamscan
 	
 test_mf: test_mf.sh mf_testgen maxflow maxflow2
 	./test_mf.sh
+	
+test_mfs: test_mfs.sh mfs_testgen maxflow maxflow3
+	./test_mfs.sh
 
 test_mt: test_mt.sh mt_testgen minspan minspan2
 	./test_mt.sh
@@ -41,6 +44,9 @@ ts_testgen: ts_testgen.cpp
 
 mf_testgen: mf_testgen.cpp
 	g++ -o mf_testgen mf_testgen.cpp $(CXXFLAGS)
+
+mfs_testgen: mfs_testgen.cpp
+	g++ -o mfs_testgen mfs_testgen.cpp $(CXXFLAGS)
 
 2sat.cpp: Makefile headers.nw graph.nw graph_test.nw datastructures.nw
 	notangle -L -R2sat.cpp headers.nw graph.nw graph_test.nw datastructures.nw > 2sat.cpp
@@ -77,6 +83,12 @@ maxflow.cpp: Makefile headers.nw graph.nw graph_test.nw
 
 maxflow: maxflow.cpp
 	g++ -o maxflow maxflow.cpp $(CXXFLAGS)
+
+maxflow3.cpp: Makefile headers.nw graph.nw graph_test.nw
+	notangle -L -Rmaxflow3.cpp headers.nw graph.nw graph_test.nw > maxflow3.cpp
+
+maxflow3: maxflow3.cpp
+	g++ -o maxflow3 maxflow3.cpp $(CXXFLAGS)
 
 maxflow2: maxflow2.cpp
 	g++ -o maxflow2 maxflow2.cpp $(CXXFLAGS)
@@ -117,9 +129,9 @@ clean:
 	rm -f 2sat.cpp bellmanford.cpp bignum.cpp
 	rm -f dijkstras.cpp floydwarshall.cpp grahamscan.cpp
 	rm -f hungarian.cpp maxflow.cpp minspan.cpp minspan2.cpp
-	rm -f polygon_area.cpp
+	rm -f polygon_area.cpp maxflow3.cpp
 	rm -f 2sat bellmanford bignum dijkstras floydwarshall
 	rm -f grahamscan hungarian maxflow maxflow2 minspan
-	rm -f minspan2 polygon_area
-	rm -f mt_testgen sp_testgen ts_testgen mf_testgen
+	rm -f minspan2 polygon_area maxflow3
+	rm -f mt_testgen sp_testgen ts_testgen mf_testgen mfs_testgen
 	

@@ -148,7 +148,7 @@ int main()
 }
 @
 
-\subsection{Test program for maxflow}
+\subsection{Test programs for maxflow}
 
 <<maxflow.cpp>>=
 <<headers>>
@@ -189,6 +189,39 @@ int main()
 }
 @
 
+<<maxflow3.cpp>>=
+<<headers>>
+<<graph config>>
+<<graph adjacency>>
+<<graph adjacency distance results>>
+<<dijkstras minnorm>>
+<<base maxflow>>
+
+int main()
+{
+	int n, e, source, sink;
+	scanf("%d %d %d %d", &n, &e, &source, &sink);
+
+	edges.clear();
+	edges.resize(n, vector<int>(0));
+	edgecost.clear();
+	edgecost.resize(n, vector<DTYPE>(0));
+
+	for (int i=0; i<e; i++)
+	{
+		int f, t, c, cap;
+		scanf("%d %d %d %d", &f, &t, &c, &cap);
+		edges[f].push_back(t);
+		edgecost[f].push_back(c);
+	}
+	
+	int result = maxflow(source, sink);
+	
+	printf("%d %d\n", result, 0);
+	
+	return 0;
+}
+@
 
 \subsection{Test program floyd-warshall}
 
