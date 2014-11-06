@@ -1,6 +1,7 @@
 .PHONY: clean test_mf test_mt test_sp test_ts test
 .DEFAULT_GOAL := trm.pdf
 SHELL := /bin/bash
+CXXFLAGS := -O2 -Wall -Wextra -Wno-unused-result -Wno-sign-compare
 
 trm.pdf: Makefile voorblad.pdf content.pdf
 	pdftk voorblad.pdf content.pdf cat output trm.pdf
@@ -30,85 +31,85 @@ test_ts: test_ts.sh ts_testgen 2sat
 	./test_ts.sh
 
 mt_testgen: mt_testgen.cpp
-	g++ -o mt_testgen mt_testgen.cpp -O2 -Wall -Wextra
+	g++ -o mt_testgen mt_testgen.cpp $(CXXFLAGS)
 
 sp_testgen: sp_testgen.cpp
-	g++ -o sp_testgen sp_testgen.cpp -O2 -Wall -Wextra
+	g++ -o sp_testgen sp_testgen.cpp $(CXXFLAGS)
 
 ts_testgen: ts_testgen.cpp
-	g++ -o ts_testgen ts_testgen.cpp -O2 -Wall -Wextra
+	g++ -o ts_testgen ts_testgen.cpp $(CXXFLAGS)
 
 mf_testgen: mf_testgen.cpp
-	g++ -o mf_testgen mf_testgen.cpp -O2 -Wall -Wextra
+	g++ -o mf_testgen mf_testgen.cpp $(CXXFLAGS)
 
 2sat.cpp: Makefile headers.nw graph.nw graph_test.nw datastructures.nw
 	notangle -L -R2sat.cpp headers.nw graph.nw graph_test.nw datastructures.nw > 2sat.cpp
 
 2sat: 2sat.cpp
-	g++ -o 2sat 2sat.cpp -O2 -Wall -Wextra
+	g++ -o 2sat 2sat.cpp $(CXXFLAGS)
 
 dijkstras.cpp: Makefile headers.nw graph.nw graph_test.nw
 	notangle -L -Rdijkstras.cpp headers.nw graph.nw graph_test.nw > dijkstras.cpp
 
 dijkstras: dijkstras.cpp
-	g++ -o dijkstras dijkstras.cpp -O2 -Wall -Wextra
+	g++ -o dijkstras dijkstras.cpp $(CXXFLAGS)
 
 bellmanford.cpp: Makefile headers.nw graph.nw graph_test.nw
 	notangle -L -Rbellmanford.cpp headers.nw graph.nw graph_test.nw > bellmanford.cpp
 
 bellmanford: bellmanford.cpp
-	g++ -o bellmanford bellmanford.cpp -O2 -Wall -Wextra
+	g++ -o bellmanford bellmanford.cpp $(CXXFLAGS)
 
 minspan.cpp: Makefile headers.nw graph.nw graph_test.nw
 	notangle -L -Rminspan.cpp headers.nw graph.nw graph_test.nw > minspan.cpp
 
 minspan: minspan.cpp
-	g++ -o minspan minspan.cpp -O2 -Wall -Wextra
+	g++ -o minspan minspan.cpp $(CXXFLAGS)
 
 minspan2.cpp: Makefile headers.nw graph_test.nw datastructures.nw
 	notangle -L -Rminspan2.cpp headers.nw graph_test.nw datastructures.nw > minspan2.cpp
 
 minspan2: minspan2.cpp
-	g++ -o minspan2 minspan2.cpp -O2 -Wall -Wextra
+	g++ -o minspan2 minspan2.cpp $(CXXFLAGS)
 
 maxflow.cpp: Makefile headers.nw graph.nw graph_test.nw
 	notangle -L -Rmaxflow.cpp headers.nw graph.nw graph_test.nw > maxflow.cpp
 
 maxflow: maxflow.cpp
-	g++ -o maxflow maxflow.cpp -O2 -Wall -Wextra
+	g++ -o maxflow maxflow.cpp $(CXXFLAGS)
 
 maxflow2: maxflow2.cpp
-	g++ -o maxflow2 maxflow2.cpp -O2 -Wall -Wextra
+	g++ -o maxflow2 maxflow2.cpp $(CXXFLAGS)
 
 floydwarshall.cpp: Makefile headers.nw graph.nw graph_test.nw
 	notangle -L -Rfloydwarshall.cpp headers.nw graph.nw graph_test.nw > floydwarshall.cpp
 
 floydwarshall: floydwarshall.cpp
-	g++ -o floydwarshall floydwarshall.cpp -O2 -Wall -Wextra
+	g++ -o floydwarshall floydwarshall.cpp $(CXXFLAGS)
 
 hungarian.cpp: Makefile headers.nw graph.nw graph_test.nw
 	notangle -L -Rhungarian.cpp headers.nw graph.nw graph_test.nw > hungarian.cpp
 
 hungarian: hungarian.cpp
-	g++ -o hungarian hungarian.cpp -O2 -Wall -Wextra
+	g++ -o hungarian hungarian.cpp $(CXXFLAGS)
 	
 bignum.cpp: Makefile headers.nw bignum.nw bignum_test.nw
 	notangle -L -Rbignum.cpp headers.nw bignum.nw bignum_test.nw > bignum.cpp
 
 bignum: bignum.cpp
-	g++ -o bignum bignum.cpp -O2 -Wall -Wextra
+	g++ -o bignum bignum.cpp $(CXXFLAGS)
 
 grahamscan.cpp: Makefile headers.nw geometrics.nw geometrics_test.nw
 	notangle -L -Rgrahamscan.cpp headers.nw geometrics.nw geometrics_test.nw > grahamscan.cpp
 
 grahamscan: grahamscan.cpp
-	g++ -o grahamscan grahamscan.cpp `pkg-config --cflags --libs cairo` -O2 -Wall -Wextra
+	g++ -o grahamscan grahamscan.cpp `pkg-config --cflags --libs cairo` $(CXXFLAGS)
 
 polygon_area.cpp: Makefile headers.nw geometrics.nw geometrics_test.nw
 	notangle -L -Rpolygon_area.cpp headers.nw geometrics.nw geometrics_test.nw > polygon_area.cpp
 
 polygon_area: polygon_area.cpp
-	g++ -o polygon_area polygon_area.cpp -O2 -Wall -Wextra
+	g++ -o polygon_area polygon_area.cpp $(CXXFLAGS)
 
 clean:
 	rm -f *.pdf *.aux *.log
