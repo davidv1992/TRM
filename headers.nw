@@ -42,11 +42,17 @@ int main()
 @
 
 The following setting changes need to be applied to gedits settings:
-tabview:\\
-	- turn on display line numbers\\
-	- turn on highlight matching brackets\\
-tabeditor:\\
-	- tab width 4\\
-	- turn on enable automatic indentation\\
-	- turn on autosave files every 10 minutes
+\begin{itemize} \itemsep1pt \parskip0pt \parsep0pt
+\item tab view:
+\begin{itemize} \itemsep1pt \parskip0pt \parsep0pt
+\item turn on display line numbers
+\item turn on highlight matching brackets
+\end{itemize}
+\item tab editor:
+\begin{itemize} \itemsep1pt \parskip0pt \parsep0pt
+\item tab width 4
+\item turn on enable automatic indentation
+\item turn on autosave files every 10 minutes
+\end{itemize}
+\end{itemize}
 
