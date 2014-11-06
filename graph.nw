@@ -121,6 +121,8 @@ void dijkstras(int start)
 \hline
 Complexity & $O(FE\log{V})$ ($F$ is flow)\\
 \hline
+Timing data & $0.02$s ($V=1000$, $E=10000$)\\
+\hline
 \end{tabular}
 
 <<dijkstras minnorm>>=
@@ -214,7 +216,7 @@ int maxflow(int source, int sink)
 \hline
 Complexity & $O(FE\log{V})$ ($F$ is flow)\\
 \hline
-Timing data & $0.5$s ($V=1000$, $E=10000$)\\
+Timing data & $0.09$s ($V=1000$, $E=10000$)\\
 \hline
 \end{tabular}
 
