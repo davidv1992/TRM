@@ -1,0 +1,18 @@
+\section{Debugging}
+
+Pre-submit checklist
+\begin{itemize}
+\item Correct example output (diff)?
+\item Theoretical complexity ok?
+\item Edge cases tested?
+\end{itemize}
+
+Error checklist
+\begin{itemize}
+\item Memory corruption? (Valgrind)
+\item Integer overflow? (compile with -ftrapv)
+\item Divides by zero (or small numbers in floating point code)?
+\item Correct output for large (near limits) testcases?
+\item Fast enough (both theoretical and practical)?
+\item Output entirely to spec? (whitespace! and string output)
+\end{itemize}

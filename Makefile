@@ -12,8 +12,8 @@ voorblad.pdf: Makefile voorblad.tex
 content.pdf: Makefile content.tex
 	pdflatex content
 
-content.tex: Makefile headers.nw graph.nw geometrics.nw datastructures.nw bignum.nw
-	noweave -t4 headers.nw graph.nw geometrics.nw datastructures.nw bignum.nw > content.tex
+content.tex: Makefile headers.nw debug.nw graph.nw geometrics.nw datastructures.nw bignum.nw
+	noweave -t4 headers.nw debug.nw graph.nw geometrics.nw datastructures.nw bignum.nw > content.tex
 
 test: test_mf test_mt test_sp test_ts test_mfs bignum grahamscan polygon_area hungarian
 	echo Please manually test bignum, hungarian, polygon_area and grahamscan
