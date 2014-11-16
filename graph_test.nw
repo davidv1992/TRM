@@ -212,7 +212,7 @@ int main()
 		int f, t, c, cap;
 		scanf("%d %d %d %d", &f, &t, &c, &cap);
 		edges[f].push_back(t);
-		edgecost[f].push_back(c);
+		edgecost[f].push_back(cap);
 	}
 	
 	int result = maxflow(source, sink);

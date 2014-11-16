@@ -154,7 +154,7 @@ void dijkstras(int start)
 			int t = edges[cur][i];
 			int c = edgecost[cur][i];
 			
-			if (done[t] || min(dist[cur], c) >= dist[t])
+			if (done[t] || min(dist[cur], c) <= dist[t])
 				continue;
 			
 			EXTRA_CHECK

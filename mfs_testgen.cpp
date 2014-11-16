@@ -29,7 +29,7 @@ int main()
 	printf("%d %d %d %d\n", n, e, source, sink);
 	for (int i=0; i<e; i++)
 	{
-		printf("%d %d %d %d\n", rand()%n, rand() % n, (rand() % (MAXDIST-MINDIST))+MINDIST, 0);
+		printf("%d %d %d %d\n", rand()%n, rand() % n, 0, (rand() % (MAXDIST-MINDIST))+MINDIST);
 	}
 	
 	return 0;
