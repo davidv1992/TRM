@@ -10,7 +10,7 @@ We have some common configuration settings.
 
 \subsection{Adjacency list}
 
-The adjecency list representation: Edges gives the destination node of each edge, edgecost the length.
+The adjacency list representation: Edges gives the destination node of each edge, edgecost the length.
 
 <<graph adjacency>>=
 vector<vector<int> > edges;

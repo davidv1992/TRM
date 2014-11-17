@@ -79,7 +79,7 @@ void normalize()
 @
 
 \subsection{Lowlevel primitives}
-These are the actual functions for addition and substraction, with carrying but without dealing with negative results.
+These are the actual functions for addition and subtraction, with carrying but without dealing with negative results.
 
 <<prim add>>=
 vector<int> prim_add(vector<int> a, vector<int> b)
