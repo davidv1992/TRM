@@ -13,6 +13,7 @@ This template includes all the important headers.
 #include <cmath>
 #include <string>
 #include <iostream>
+#include <iomanip>
 #include <sstream>
 #include <vector>
 #include <map>
