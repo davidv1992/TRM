@@ -1,7 +1,7 @@
 .PHONY: clean test_mf test_mt test_sp test_ts test
 .DEFAULT_GOAL := trm.pdf
 SHELL := /bin/bash
-CXXFLAGS := -O2 -Wall -Wextra -Wno-unused-result -Wno-sign-compare
+CXXFLAGS := -g -Wall -Wextra -Wno-unused-result -Wno-sign-compare
 
 trm.pdf: Makefile voorblad.pdf content.pdf
 	pdftk voorblad.pdf content.pdf cat output trm.pdf
@@ -123,15 +123,21 @@ polygon_area.cpp: Makefile headers.nw geometrics.nw geometrics_test.nw
 polygon_area: polygon_area.cpp
 	g++ -o polygon_area polygon_area.cpp $(CXXFLAGS)
 
+matrixmul.cpp: Makefile headers.nw matrix.nw matrix_test.nw
+	notangle -L -Rmatrixmul.cpp headers.nw matrix.nw matrix_test.nw > matrixmul.cpp
+
+matrixmul: matrixmul.cpp
+	g++ -o matrixmul matrixmul.cpp $(CXXFLAGS)
+
 clean:
 	rm -f *.pdf *.aux *.log
 	rm -f voorblad.pdf content.pdf trm.pdf content.tex
 	rm -f 2sat.cpp bellmanford.cpp bignum.cpp
 	rm -f dijkstras.cpp floydwarshall.cpp grahamscan.cpp
 	rm -f hungarian.cpp maxflow.cpp minspan.cpp minspan2.cpp
-	rm -f polygon_area.cpp maxflow3.cpp
+	rm -f polygon_area.cpp maxflow3.cpp matrixmul.cpp
 	rm -f 2sat bellmanford bignum dijkstras floydwarshall
 	rm -f grahamscan hungarian maxflow maxflow2 minspan
-	rm -f minspan2 polygon_area maxflow3
+	rm -f minspan2 polygon_area maxflow3 matrixmul
 	rm -f mt_testgen sp_testgen ts_testgen mf_testgen mfs_testgen
 	
