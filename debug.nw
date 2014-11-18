@@ -1,6 +1,6 @@
 \section{Debugging}
 
-Pre-submit checklist
+Pre-submit checklist:
 \begin{itemize}
 \item Correct example output (command: ./A $<$ testcase.in $\mid$ diff - testcase.out)?
 \item Theoretical complexity ok?
@@ -16,11 +16,11 @@ Pre-submit checklist
 \end{itemize}
 \item Edge cases tested?
 \end{itemize}
-
-Error checklist
+Error checklist:
 \begin{itemize}
 \item Memory corruption? (Valgrind)
 \item Integer overflow? (compile with -ftrapv)
+\item Implicit type conversions? (compile with -Wconversion)
 \item Divides by zero (or small numbers in floating point code)?
 \item Correct output for large (near limits) testcases?
 \item Fast enough (both theoretical and practical)?
