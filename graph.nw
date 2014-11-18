@@ -101,7 +101,7 @@ void dijkstras(int start)
 		for (int i=0; i<edges[cur].size(); i++)
 		{
 			int t = edges[cur][i];
-			int c = edgecost[cur][i];
+			DTYPE c = edgecost[cur][i];
 			
 			if (done[t] || dist[cur] + c >= dist[t])
 				continue;
@@ -152,7 +152,7 @@ void dijkstras(int start)
 		for (int i=0; i<edges[cur].size(); i++)
 		{
 			int t = edges[cur][i];
-			int c = edgecost[cur][i];
+			DTYPE c = edgecost[cur][i];
 			
 			if (done[t] || min(dist[cur], c) <= dist[t])
 				continue;
