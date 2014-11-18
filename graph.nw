@@ -79,7 +79,7 @@ void dijkstras(int start)
 {
 	int NODES = edges.size();
 	
-	priority_queue<pair<int, int> > work;
+	priority_queue<pair<DTYPE, int> > work;
 	vector<bool> done(NODES, false);
 	
 	dist.assign(NODES,INF);
@@ -130,7 +130,7 @@ void dijkstras(int start)
 {
 	int NODES = edges.size();
 	
-	priority_queue<pair<int, int> > work;
+	priority_queue<pair<DTYPE, int> > work;
 	vector<bool> done(NODES, false);
 	
 	dist.assign(NODES,0);
