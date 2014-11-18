@@ -1,0 +1,48 @@
+<<read matrix>>= 
+vector<vector<int> > read_matrix(int r, int c)
+{
+	vector<vector<int> > result(r,vector<int>(c));
+	for (int i=0; i<r; i++)
+		for (int j=0; j<c; j++)
+			cin >> result[i][j];
+	return result;
+}
+@
+
+<<print matrix>>=
+void print_matrix(vector<vector<int> > m)
+{
+	int r = m.size();
+	if (r == 0)
+		return;
+	int c= m[0].size();
+	for (int i=0; i<r; i++)
+	{
+		for (int j=0; j<c; j++)
+		{
+			if (j != 0)
+				cout << " ";
+			cout << setw(5) << m[i][j];
+		}
+		cout << endl;
+	}
+}
+@
+
+<<matrixmul.cpp>>=
+<<headers>>
+<<read matrix>>
+<<print matrix>>
+<<matrix multiplication>>
+int main()
+{
+	int n, r, m;
+	cin >> n >> r >> m;
+	vector<vector<int> > a, b, c;
+	a = read_matrix(n,r);
+	b = read_matrix(r,m);
+	matMult(a,b,c);
+	print_matrix(c);
+	return 0;
+}
+@

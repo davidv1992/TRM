@@ -1,0 +1,32 @@
+\section{Matrix multiplication}
+
+<<matrix multiplication>>=
+void matMult(vector<vector<int> > a, 
+             vector<vector<int> > b, 
+             vector<vector<int> > &c)
+{
+	int n, r, m;
+	n = a.size();
+	if (n == 0)
+		return;
+	r = a[0].size();
+	if (b.size() != r)
+		return;
+	m = b[0].size();
+	
+	c.clear();
+	c.resize(n, vector<int>(m));
+	
+	for (int i=0; i<n; i++)
+	{
+		for (int j=0; j<m; j++)
+		{
+			c[i][j] = 0;
+			for (int k=0; k<r; k++)
+			{
+				c[i][j] += a[i][k]*b[k][j];
+			}
+		}
+	}
+}
+@
