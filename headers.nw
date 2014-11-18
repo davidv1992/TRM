@@ -23,7 +23,6 @@ This template includes all the important headers.
 #include <stack>
 #include <deque>
 #include <algorithm>
-
 using namespace std;
 @
 

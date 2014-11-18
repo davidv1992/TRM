@@ -2,8 +2,18 @@
 
 Pre-submit checklist
 \begin{itemize}
-\item Correct example output (diff)?
+\item Correct example output (command: ./A $<$ testcase.in $\mid$ diff - testcase.out)?
 \item Theoretical complexity ok?
+\begin{itemize}
+	\item $O(n) \rightarrow n ~ 10000000$
+	\item $O(n \log(n))\rightarrow n ~1000000$
+	\item $O(n^2) \rightarrow n ~ 10000$
+	\item $O(n^3) \rightarrow n ~ 500$
+	\item $O(n^4) \rightarrow n ~ 100$
+	\item $O(2^n) \rightarrow n ~ 20$
+	\item $O(n^2 2^n)\rightarrow n ~ 16$
+	\item $O(n!) \rightarrow n ~ 10$
+\end{itemize}
 \item Edge cases tested?
 \end{itemize}
 
