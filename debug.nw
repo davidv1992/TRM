@@ -5,14 +5,14 @@ Pre-submit checklist:
 \item Correct example output (command: ./A $<$ testcase.in $\mid$ diff - testcase.out)?
 \item Theoretical complexity ok?
 \begin{itemize}
-	\item $O(n) \rightarrow n ~ 10000000$
-	\item $O(n \log(n))\rightarrow n ~1000000$
-	\item $O(n^2) \rightarrow n ~ 10000$
-	\item $O(n^3) \rightarrow n ~ 500$
-	\item $O(n^4) \rightarrow n ~ 100$
-	\item $O(2^n) \rightarrow n ~ 20$
-	\item $O(n^2 2^n)\rightarrow n ~ 16$
-	\item $O(n!) \rightarrow n ~ 10$
+	\item $O(n) \rightarrow n \approx 10000000$
+	\item $O(n \log(n))\rightarrow n \approx1000000$
+	\item $O(n^2) \rightarrow n \approx 10000$
+	\item $O(n^3) \rightarrow n \approx 500$
+	\item $O(n^4) \rightarrow n \approx 100$
+	\item $O(2^n) \rightarrow n \approx 20$
+	\item $O(n^2 2^n)\rightarrow n \approx 16$
+	\item $O(n!) \rightarrow n \approx 10$
 \end{itemize}
 \item Edge cases tested?
 \end{itemize}

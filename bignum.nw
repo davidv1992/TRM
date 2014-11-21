@@ -152,7 +152,7 @@ bignum operator+(bignum b)
 }
 @
 
-\subsection{Substraction}
+\subsection{Subtraction}
 <<bignum sub>>=
 bignum operator-(bignum b)
 {
