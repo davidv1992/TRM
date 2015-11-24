@@ -7,13 +7,13 @@ trm.pdf: Makefile voorblad.pdf content.pdf
 	pdftk voorblad.pdf content.pdf cat output trm.pdf
 
 voorblad.pdf: Makefile voorblad.tex
-	pdflatex voorblad
+	latexmk -pdf voorblad
 
 content.pdf: Makefile content.tex
-	pdflatex content
+	latexmk -pdf content
 
-content.tex: Makefile headers.nw debug.nw graph.nw geometrics.nw datastructures.nw bignum.nw
-	noweave -t4 headers.nw debug.nw graph.nw geometrics.nw datastructures.nw bignum.nw > content.tex
+content.tex: Makefile headers.nw debug.nw graph.nw geometrics.nw datastructures.nw bignum.nw trailer.nw
+	noweave -t4 -delay headers.nw debug.nw graph.nw geometrics.nw datastructures.nw bignum.nw trailer.nw > content.tex
 
 test: test_mf test_mt test_sp test_ts test_mfs bignum grahamscan polygon_area hungarian
 	echo Please manually test bignum, hungarian, polygon_area and grahamscan

@@ -1,3 +1,20 @@
+%header for tex generation using noweb. This allows me to put in extra packages
+\documentclass{article}
+\usepackage{noweb}
+%\pagestyle{noweb}
+\noweboptions{}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\pagestyle{fancy}
+\renewcommand{\headrule}{}
+\lhead{Radboud Universiteit Nijmegen}
+\rhead{\thepage / \pageref{LastPage}}
+\cfoot{}
+\usepackage{titlesec}
+\newcommand{\sectionbreak}{\clearpage}
+\begin{document}
+@
+
 \def\nwendcode{\endtrivlist \endgroup}
 \let\nwdocspar=\par
 
